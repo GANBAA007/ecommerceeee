@@ -6,7 +6,7 @@ import (
 
 type Invoice struct {
 	gorm.Model
-
-	Number     string
-	CustomerID uint
+	UserID   uint
+	Products []Products `gorm:"many2many:order_products" json:"products"`
+	Total    int64      `json:"total"`
 }
