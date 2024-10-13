@@ -86,14 +86,7 @@ func createUser(w http.ResponseWriter, r *http.Request) { // Corrected function 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
 }
-func dropDeletedAtColumn() {
-	// This function will be called to drop the DeletedAt column
-	if err := DB.Migrator().DropColumn(&models.Order{}, "deleted_at"); err != nil {
-		log.Printf("Failed to drop column 'deleted_at': %v", err)
-	} else {
-		log.Println("Column 'deleted_at' dropped successfully.")
-	}
-}
+
 func CreateInvoices(w http.ResponseWriter, r *http.Request) {
 	var invoice models.Order
 
