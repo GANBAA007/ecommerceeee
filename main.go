@@ -1,14 +1,17 @@
 package main
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"log"
-	"net/http"
-	"os"
+	// "net/http"
+	// "os"
+	// "os/user"
+	"fmt"
 
 	"github.com/GANBAA007/ecommerceeee/models"
-	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
+
+	// "github.com/gorilla/mux"
+	// "github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -16,48 +19,115 @@ import (
 var DB *gorm.DB
 var err error
 
-func init() {
-	// Load environment variables from .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+// func init() {
+// 	// Load environment variables from .env file
+// 	err = godotenv.Load()
+// 	if err != nil {
+// 		log.Fatal("Error loading .env file")
+// 	}
 
-	// Set up the MySQL database connection
-	dsn := os.Getenv("DB_USERNAME") + ":" + os.Getenv("DB_PASSWORD") + "@tcp(" + os.Getenv("DB_HOST") + ")/" + os.Getenv("DB_NAME") + "?charset=utf8mb4&parseTime=True&loc=Local"
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
-	}
+// 	// Log the database username for debugging purposes
+// 	log.Println("DB_USERNAME:", os.Getenv("DB_USERNAME"))
 
-	// Auto-migrate the Product model
-	DB.AutoMigrate(&models.Products{})
-}
+// 	// Set up the MySQL database connection
+// 	dsn := os.Getenv("DB_USERNAME") + ":" + os.Getenv("DB_PASSWORD") + "@tcp(" + os.Getenv("DB_HOST") + ":" + os.Getenv("DB_PORT") + ")/" + os.Getenv("DB_NAME") + "?charset=utf8mb4&parseTime=True&loc=Local"
+// 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+// 	if err != nil {
+// 		log.Fatal("Failed to connect to database:", err)
+// 	}
 
+//		// Auto-migrate the Product model
+//		DB.AutoMigrate(&models.Products{})
+//	}
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/products", createProduct).Methods("POST")
+	dsn := "user:password@tcp(localhost:5432)/onlineshop?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	fmt.Println("Database connected successfully")
 
-	log.Println("Server is running on port 8080")
-	http.ListenAndServe(":8080", r)
+	// Migrate the schema
+	db.AutoMigrate(&models.User{}, models.Product{}, models.Order{}, models.OrderItem{}, models.Employee{}, models.Admin{})
+	fmt.Println("Database schema migrated")
 }
 
-func createProduct(w http.ResponseWriter, r *http.Request) {
-	var product models.Products
+// func main() {
+// 	r := mux.NewRouter()
+// 	r.HandleFunc("/products", createProduct).Methods("POST")
+// 	r.HandleFunc("/invoices-Create", CreateInvoices).Methods("POST")
+// 	r.HandleFunc("/users", createUser).Methods("POST")
 
-	// Decode the JSON body into the product struct
-	if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+// 	log.Println("Server is running on port 8080")
 
-	// Save the product to the database
-	if result := DB.Create(&product); result.Error != nil {
-		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
-		return
-	}
+// 	if err := http.ListenAndServe(":8080", r); err != nil {
+// 		log.Fatal("ListenAndServe error:", err)
+// 	}
 
-	// Return the created product as a JSON response
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(product)
-}
+// }
+
+// func createProduct(w http.ResponseWriter, r *http.Request) {
+// 	var product models.Products
+
+// 	// Decode the JSON body into the product struct
+// 	if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
+// 		http.Error(w, err.Error(), http.StatusBadRequest)
+// 		return
+// 	}
+
+// 	// Save the product to the database
+// 	if result := DB.Create(&product); result.Error != nil {
+// 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	// Return the created product as a JSON response
+// 	w.Header().Set("Content-Type", "application/json")
+// 	json.NewEncoder(w).Encode(product)
+// }
+// func createUser(w http.ResponseWriter, r *http.Request) { // Corrected function name
+// 	var user models.User
+
+// 	// Decode the JSON body into the user struct
+// 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+// 		http.Error(w, err.Error(), http.StatusBadRequest)
+// 		return
+// 	}
+
+// 	// Save the user to the database
+// 	if result := DB.Create(&user); result.Error != nil {
+// 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	// Return the created user as a JSON response
+// 	w.Header().Set("Content-Type", "application/json")
+// 	json.NewEncoder(w).Encode(user)
+// }
+// func dropDeletedAtColumn() {
+// 	// This function will be called to drop the DeletedAt column
+// 	if err := DB.Migrator().DropColumn(&models.Invoice{}, "deleted_at"); err != nil {
+// 		log.Printf("Failed to drop column 'deleted_at': %v", err)
+// 	} else {
+// 		log.Println("Column 'deleted_at' dropped successfully.")
+// 	}
+// }
+// func CreateInvoices(w http.ResponseWriter, r *http.Request) {
+// 	var invoice models.Invoice
+
+// 	// Decode the JSON body into the invoice struct
+// 	if err := json.NewDecoder(r.Body).Decode(&invoice); err != nil {
+// 		http.Error(w, err.Error(), http.StatusBadRequest)
+// 		return
+// 	}
+
+// 	// Save the invoice to the database
+// 	if result := DB.Create(&invoice); result.Error != nil {
+// 		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	// Return the created invoice as a JSON response
+// 	w.Header().Set("Content-Type", "application/json")
+// 	json.NewEncoder(w).Encode(invoice)
+// }

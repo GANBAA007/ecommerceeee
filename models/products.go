@@ -4,12 +4,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type Products struct {
+type Product struct {
 	gorm.Model
-	Name         string  `json:"name"`
-	Description  string  `json:"description"`
-	Price        float64 `json:"price"`
-	Stock        int     `json:"stock"`
-	CategoryID   uint    `json:"category_id"`
-	CategoryName string  `json:"category"`
+	Name        string      `gorm:"not null"`
+	Description string      `gorm:"type:text"`
+	Price       float64     `gorm:"not null"`
+	Stock       int         `gorm:"not null"`
+	OrderItems  []OrderItem `gorm:"foreignKey:ProductID"` // One-to-many relationship with OrderItem
 }
