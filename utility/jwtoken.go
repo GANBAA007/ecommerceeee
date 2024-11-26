@@ -9,23 +9,32 @@ import (
 )
 
 func GenerateToken(email string) (string, error) {
-	claims := jwt.MapClaims{
-		"email": email,
-		"exp":   time.Now().Add(time.Hour * 12).Unix(),
+	// Check if the email is not empty
+	if email == "" {
+		return "", fmt.Errorf("email cannot be empty")
 	}
 
-	// Fetch the secret key from the environment
+	// Define claims for the JWT token
+	claims := jwt.MapClaims{
+		"email": email,                                 // Store the email in the claims
+		"exp":   time.Now().Add(time.Hour * 12).Unix(), // Expiry time set to 12 hours from now
+	}
+
+	// Fetch the secret key from environment variables
 	secretKey := os.Getenv("SECRET_KEY")
 	if secretKey == "" {
-		return "", fmt.Errorf("secret key not set")
+		return "", fmt.Errorf("secret key is not set in environment")
 	}
 
-	// Create a new JWT token with claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) // Use HS256 (HMAC SHA256) method for signing
+	// Create the JWT token using the claims and signing method
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Sign the token with the secret key
 	signedToken, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		return "", fmt.Errorf("failed to sign token: %v", err)
 	}
 
+	// Return the signed token
 	return signedToken, nil
 }

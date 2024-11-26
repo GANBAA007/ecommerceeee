@@ -34,7 +34,7 @@ func CreateUser(c *gin.Context) {
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Printf("encrypting error&v", err)
+		log.Printf("encrypting error %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error hashing password"})
 		return
 	}
