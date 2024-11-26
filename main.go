@@ -1,77 +1,44 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 
-	"net/http"
-	"os"
-
+	"ecommerceeee/config"
 	"ecommerceeee/models"
+	"ecommerceeee/routes"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-var err error
+func Migrate() {
+	// Migrate the database schema for all models
+	err := config.DB.AutoMigrate(&models.Admin{}, &models.Employee{}, &models.Product{}, &models.User{}, &models.Order{}, &models.OrderItem{})
+	if err != nil {
+		log.Fatalf("Migrating failed: %v", err)
+	} else {
+		log.Println("Migration successful")
+	}
+}
 
-func init() {
+func main() {
 
-	err = godotenv.Load()
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	dsn := os.Getenv("DB_USERNAME") + ":" + os.Getenv("DB_PASSWORD") + "@tcp(" + os.Getenv("DB_HOST") + ":" + os.Getenv("DB_PORT") + ")/" + os.Getenv("DB_NAME") + "?charset=utf8mb4&parseTime=True&loc=Local"
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	config.ConnectDB()
+	Migrate()
+
+	r := gin.Default()
+
+	err = r.SetTrustedProxies(nil)
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Fatalf("Failed to set trusted proxies: %v", err)
 	}
 
-	DB.AutoMigrate(&models.Admin{}, &models.Employee{}, &models.Order{}, &models.OrderItem{}, &models.Product{}, &models.User{})
-}
+	routes.SetupRoutes(r)
 
-func main() {
-	log.Println("Server is running on port 8080")
-
-	if err := http.ListenAndServe(":8080", r); err != nil {
-		log.Fatal("ListenAndServe error:", err)
-	}
-
-}
-
-func createUser(w http.ResponseWriter, r *http.Request) {
-	var user models.User
-
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	if result := DB.Create(&user); result.Error != nil {
-		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
-}
-
-func CreateInvoices(w http.ResponseWriter, r *http.Request) {
-	var invoice models.Order
-
-	if err := json.NewDecoder(r.Body).Decode(&invoice); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	if result := DB.Create(&invoice); result.Error != nil {
-		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(invoice)
+	r.Run(":8080")
 }

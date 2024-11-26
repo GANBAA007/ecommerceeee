@@ -10,5 +10,6 @@ type Product struct {
 	Description string      `gorm:"type:text"`
 	Price       float64     `gorm:"not null"`
 	Stock       int         `gorm:"not null"`
-	OrderItems  []OrderItem `gorm:"foreignKey:ProductID"` // One-to-many relationship with OrderItem
+	OrderItems  []OrderItem `gorm:"foreignKey:ProductID"`
+	Img         []byte
 }

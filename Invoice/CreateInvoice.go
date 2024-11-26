@@ -1,0 +1,5 @@
+package invoice
+
+func CreateInvoice() {
+
+}
