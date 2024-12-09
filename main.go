@@ -13,7 +13,7 @@ import (
 
 func Migrate() {
 	// Migrate the database schema for all models
-	err := config.DB.AutoMigrate(&models.Admin{}, &models.Employee{}, &models.Product{}, &models.User{}, &models.Order{}, &models.OrderItem{})
+	err := config.DB.AutoMigrate(&models.Admin{}, &models.Product{}, &models.User{}, &models.Order{}, &models.OrderItem{}, &models.Cart{})
 	if err != nil {
 		log.Fatalf("Migrating failed: %v", err)
 	} else {
@@ -42,3 +42,7 @@ func main() {
 
 	r.Run(":8080")
 }
+
+// CreateInvoice
+// Pay
+// checkPayment

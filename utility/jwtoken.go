@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateToken(email string) (string, error) {
+func GenerateToken(email string, expiration time.Duration) (string, error) {
 	// Check if the email is not empty
 	if email == "" {
 		return "", fmt.Errorf("email cannot be empty")
@@ -16,8 +16,8 @@ func GenerateToken(email string) (string, error) {
 
 	// Define claims for the JWT token
 	claims := jwt.MapClaims{
-		"email": email,                                 // Store the email in the claims
-		"exp":   time.Now().Add(time.Hour * 12).Unix(), // Expiry time set to 12 hours from now
+		"email": email,                             // Store the email in the claims
+		"exp":   time.Now().Add(expiration).Unix(), // Expiry time set based on input
 	}
 
 	// Fetch the secret key from environment variables

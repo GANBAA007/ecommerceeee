@@ -4,7 +4,10 @@ import (
 	"ecommerceeee/config"
 	"ecommerceeee/models"
 	"ecommerceeee/utility"
+	"log"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -23,34 +26,43 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	// Normalize email input
+	req.Email = strings.TrimSpace(req.Email)
+
 	// Fetch user from the database
 	var user models.User
 	if err := config.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
-		// If the user is not found
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Email or password incorrect"})
 			return
 		}
-		// If other DB errors occur
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user"})
+		log.Printf("Error fetching user: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "An unexpected error occurred"})
 		return
 	}
 
 	// Compare the password with the stored hash using bcrypt
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		// If password comparison fails
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email or password incorrect"})
 		return
 	}
 
-	// Generate a JWT token after successful login
-	token, err := utility.GenerateToken(req.Email)
+	// Generate a JWT token after successful login with a custom expiration time (e.g., 12 hours)
+	token, err := utility.GenerateToken(user.Email, time.Hour*12)
 	if err != nil {
-		// If token generation fails
+		log.Printf("Error generating token: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
 	}
 
-	// Respond with the generated token
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	// Respond with the token and user info
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Login successful",
+		"token":   token,
+		"user": gin.H{
+			"id":    user.ID,
+			"name":  user.Name,
+			"email": user.Email,
+		},
+	})
 }

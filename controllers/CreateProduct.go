@@ -41,14 +41,12 @@ func CreateProduct(c *gin.Context) {
 	// Set the timestamps
 	product.CreatedAt = time.Now()
 	product.UpdatedAt = time.Now()
-
 	// Create the product in the database
 	if err := config.DB.Create(&product).Error; err != nil {
 		log.Printf("Error creating product: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating product"})
 		return
 	}
-
 	// Return the created product
 	c.JSON(http.StatusCreated, product)
 }

@@ -1,4 +1,4 @@
-package middleware
+package Middleware
 
 import (
 	"ecommerceeee/utility"
@@ -49,8 +49,8 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// You can store the userEmail in the context if you need it for further use
-		c.Set("userEmail", userEmail)
+		// Store the email in the context
+		c.Set("email", userEmail)
 
 		// Proceed to the next handler
 		c.Next()
