@@ -13,7 +13,8 @@ func SetupRoutes(r *gin.Engine) {
 	{
 		public.POST("/product", controllers.CreateProduct) // Endpoint for creating a product
 		public.POST("/user", controllers.CreateUser)       // Endpoint for creating a user
-		public.POST("/login", controllers.Login)           // Endpoint for user login
+		public.POST("/login", controllers.Login)
+		public.GET("/products", controllers.GetProd) // Endpoint for user login
 	}
 
 	// Protected routes (require authentication)
