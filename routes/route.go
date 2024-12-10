@@ -2,13 +2,14 @@ package routes
 
 import (
 	"ecommerceeee/controllers"
-	Middleware "ecommerceeee/middleware"
+	middleware "ecommerceeee/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRoutes(r *gin.Engine) {
 	// Public routes
+	r.Use(middleware.CORSMiddleware())
 	public := r.Group("/ecomm")
 	{
 		public.POST("/product", controllers.CreateProduct) // Endpoint for creating a product
@@ -19,7 +20,7 @@ func SetupRoutes(r *gin.Engine) {
 
 	// Protected routes (require authentication)
 	protected := r.Group("/ecomm")
-	protected.Use(Middleware.JWTMiddleware())
+	protected.Use(middleware.JWTMiddleware())
 	{
 		protected.POST("/cart/add", controllers.AddToCart)           // Add product to cart
 		protected.GET("/cart", controllers.GetCart)                  // Get user's cart

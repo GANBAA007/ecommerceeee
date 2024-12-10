@@ -7,7 +7,6 @@ import (
 	"ecommerceeee/models"
 	"ecommerceeee/routes"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -34,16 +33,10 @@ func main() {
 
 	r := gin.Default()
 
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"}, // Replace with your frontend URL
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
-		AllowHeaders:     []string{"Content-Type", "Authorization"},
-		AllowCredentials: true, // Allow credentials like cookies or authorization headers
-	}))
-
 	routes.SetupRoutes(r)
 
 	r.Run(":8080")
+
 }
 
 // CreateInvoice
