@@ -28,7 +28,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-
 	config.ConnectDB()
 	Migrate()
 
@@ -37,6 +36,7 @@ func main() {
 	r.Use(middleware.CORSMiddleware())
 
 	routes.SetupRoutes(r)
+	routes.RegisterProductRoutes(r)
 
 	r.Run(":8080")
 
