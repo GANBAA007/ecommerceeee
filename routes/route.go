@@ -9,7 +9,7 @@ import (
 
 func SetupRoutes(r *gin.Engine) {
 	// Public routes
-	r.Use(middleware.CORSMiddleware())
+
 	public := r.Group("/ecomm")
 	{
 		public.POST("/product", controllers.CreateProduct) // Endpoint for creating a product

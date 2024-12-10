@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"ecommerceeee/config"
+	"ecommerceeee/middleware"
 	"ecommerceeee/models"
 	"ecommerceeee/routes"
 
@@ -32,6 +33,8 @@ func main() {
 	Migrate()
 
 	r := gin.Default()
+
+	r.Use(middleware.CORSMiddleware())
 
 	routes.SetupRoutes(r)
 
