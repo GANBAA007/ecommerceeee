@@ -1,8 +1,8 @@
 package routes
 
 import (
+	middleware "ecommerceeee/Middleware"
 	"ecommerceeee/controllers"
-	middleware "ecommerceeee/middleware"
 
 	"github.com/gin-gonic/gin"
 )

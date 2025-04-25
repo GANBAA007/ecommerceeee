@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"ecommerceeee/config"
-	"ecommerceeee/models" // Update to the correct import path for your models
+	"ecommerceeee/models"
 	"net/http"
 	"strconv"
 
@@ -10,7 +10,7 @@ import (
 )
 
 func GetProductById(c *gin.Context) {
-	// Retrieve the product ID from the URL parameters
+	// Get the ID from the URL
 	id := c.Param("id")
 	productID, err := strconv.Atoi(id)
 	if err != nil {
@@ -18,16 +18,13 @@ func GetProductById(c *gin.Context) {
 		return
 	}
 
-	// Create a variable to hold the product
-	var product models.Product // Replace with your actual Product model
+	var product models.Product
 
-	// Query the database for the product
-	result := config.DB.First(&product, productID)
-	if result.Error != nil {
+	// Look up the product by primary key (id)
+	if err := config.DB.First(&product, productID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
 	}
 
-	// Return the product as a JSON response
 	c.JSON(http.StatusOK, product)
 }

@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
+	middleware "ecommerceeee/Middleware"
 	"ecommerceeee/config"
-	"ecommerceeee/middleware"
 	"ecommerceeee/models"
 	"ecommerceeee/routes"
 

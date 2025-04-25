@@ -12,7 +12,7 @@ import (
 func GetProd(c *gin.Context) {
 	var items []models.Product
 	if err := config.DB.Find(&items).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "getproducts error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "get products error"})
 		return
 	}
 
